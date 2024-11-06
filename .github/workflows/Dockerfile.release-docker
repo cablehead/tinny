@@ -16,13 +16,13 @@ RUN apt-get update && apt-get install -y \
     cmake \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PATH="/root/.cargo/bin:/osxcross/bin:$PATH"
+ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
+
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 # Add aarch64-apple-darwin target
 RUN rustup target add aarch64-apple-darwin
-
-ENV PATH="/root/.cargo/bin:/osxcross/bin:$PATH"
-ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
 
 # Cargo configuration
 ENV CARGO_HOME="/root/.cargo"
