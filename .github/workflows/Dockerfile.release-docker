@@ -8,11 +8,36 @@ RUN apt-get update && apt-get install -y \
     clang \
     lld \
     libc6-dev \
+    curl \
+    file \
+    git \
+    build-essential \
+    pkg-config \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/osxcross/bin:$PATH"
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# Add aarch64-apple-darwin target
+RUN rustup target add aarch64-apple-darwin
+
+ENV PATH="/root/.cargo/bin:/osxcross/bin:$PATH"
 ENV LD_LIBRARY_PATH="/osxcross/lib:$LD_LIBRARY_PATH"
 
+# Cargo configuration
+ENV CARGO_HOME="/root/.cargo"
+ENV RUSTUP_HOME="/root/.rustup"
+# Set default target for convenience
+ENV CARGO_BUILD_TARGET="aarch64-apple-darwin"
+
+# Set cross-compilation environment variables
+ENV CC=aarch64-apple-darwin23.6-clang
+ENV CXX=aarch64-apple-darwin23.6-clang++
+ENV CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=aarch64-apple-darwin23.6-clang
+
 COPY --from=osxcross /osxcross /osxcross
+
+# Create a directory for projects
+WORKDIR /workspace
 
 CMD ["sleep", "infinity"]
